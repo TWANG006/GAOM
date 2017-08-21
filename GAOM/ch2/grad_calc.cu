@@ -2,6 +2,17 @@
 #include <device_launch_parameters.h>
 #include "grad_calc.cuh"
 
+__global__ void gradient_Kernel(float *in_Img, int iImgHeight, int iImgWidth, float *out_xx, float *out_yy, float *out_xy)
+{
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+	int idy = blockIdx.y * blockDim.y + threadIdx.y;
+	int id = idy*(iImgWidth - 2) + idx;
+
+	if (idx < iImgWidth && idy < iImgHeight)
+	{
+	}
+}
+
 __global__ void gradient_kernel(
 	float *m_dImg1, float *m_dImg2,
 	int m_iHeight, int m_iWidth,
