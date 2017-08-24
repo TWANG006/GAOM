@@ -2,88 +2,101 @@
 #include <device_launch_parameters.h>
 #include "grad_calc.cuh"
 
-__global__ void gradient_Kernel(float *in_Img, int iImgHeight, int iImgWidth, float *out_xx, float *out_yy, float *out_xy)
-{
-	int idx = blockIdx.x * blockDim.x + threadIdx.x;
-	int idy = blockIdx.y * blockDim.y + threadIdx.y;
-	int id = idy*(iImgWidth - 2) + idx;
+#include <iostream>
 
-	if (idx < iImgWidth && idy < iImgHeight)
-	{
-	}
-}
-
-__global__ void gradient_kernel(
-	float *m_dImg1, float *m_dImg2,
-	int m_iHeight, int m_iWidth,
-	int m_iImgHeight, int m_iImgWidth,
-	float *m_dR,
-	float *m_dRx, float *m_dRy,
-	float *m_dT,
-	float *m_dTx, float *m_dTy, float *m_dTxy)
+__global__ void gradient_kernel(float *d_Img, int iHeight, int iWidth,
+	int iImgHeight, int iImgWidth,
+	float *d_Gx, float *d_Gy, float *d_Gxy)
 {
 	int tid = blockIdx.x*blockDim.x + threadIdx.x;
-	int i = tid / m_iWidth;
-	int j = tid%m_iWidth;
-	if (tid < m_iWidth*m_iHeight)
+	int i = tid / iWidth;
+	int j = tid % iWidth;
+	if (tid < iWidth*iHeight)
 	{
-		m_dR[tid] = m_dImg1[m_iImgWidth*(i + 1) + j + 1];
-		m_dRx[tid] = 0.5*(m_dImg1[m_iImgWidth*(i + 1) + j + 2] - m_dImg1[m_iImgWidth*(i + 1) + j]);
-		m_dRy[tid] = 0.5*(m_dImg1[m_iImgWidth*(i + 2) + j + 1] - m_dImg1[m_iImgWidth*(i)+j + 1]);
-
-		m_dT[tid] = m_dImg2[m_iImgWidth*(i + 1) + j + 1];
-		m_dTx[tid] = 0.5*(m_dImg2[m_iImgWidth*(i + 1) + j + 2] - m_dImg2[m_iImgWidth*(i + 1) + j]);
-		m_dTy[tid] = 0.5*(m_dImg2[m_iImgWidth*(i + 2) + j + 1] - m_dImg2[m_iImgWidth*(i)+j + 1]);
-		m_dTxy[tid] = 0.25*(m_dImg2[m_iImgWidth*(i + 2) + j + 2] - m_dImg2[m_iImgWidth*(i)+j + 2] -
-			m_dImg2[m_iImgWidth*(i + 2) + j] + m_dImg2[m_iImgWidth*(i)+j]);
+		d_Gx[tid] = 0.5*(d_Img[iImgWidth*(i + 1) + j + 2] - d_Img[iImgWidth*(i + 1) + j]);
+		d_Gy[tid] = 0.5*(d_Img[iImgWidth*(i + 2) + j + 1] - d_Img[iImgWidth*(i)+j + 1]);
+		d_Gxy[tid] = 0.25*(d_Img[iImgWidth*(i + 2) + j + 2] - d_Img[iImgWidth*(i)+j + 2] -
+			d_Img[iImgWidth*(i + 2) + j] + d_Img[iImgWidth*(i)+j]);
 	}
 }
 
-__global__ void gradient_kernel_optimized(
-	float *m_dImg1, float *m_dImg2,
-	int m_iHeight, int m_iWidth,
-	int m_iImgHeight, int m_iImgWidth,
-	float *m_dR,
-	float *m_dRx, float *m_dRy,
-	float *m_dT,
-	float *m_dTx, float *m_dTy, float *m_dTxy)
+__global__ void gradient_kernel_optimized(float *d_Img, int iHeight, int iWidth,
+	int iImgHeight, int iImgWidth,
+	float *d_Gx, float *d_Gy, float *d_Gxy)
 {
 	//Block Index
-	const int by = blockIdx.y;
-	const int bx = blockIdx.x;
+	const int by = blockIdx.y;	const int bx = blockIdx.x;
 	//Thread Index
-	const int ty = threadIdx.y;
-	const int tx = threadIdx.x;
+	const int ty = threadIdx.y;	const int tx = threadIdx.x;
+
 	//Global Memory offset: every block actually begin with 2 overlapped pixels
 	const int y = ty + (BLOCK_SIZE_Y - 2) * by;
 	const int x = tx + (BLOCK_SIZE_X - 2) * bx;
 
 	//Declare the shared memory for storing the tiled subset
-	__shared__ float imgR_sh[BLOCK_SIZE_Y][BLOCK_SIZE_X];
-	__shared__ float imgT_sh[BLOCK_SIZE_Y][BLOCK_SIZE_X];
+	__shared__ float img_sh[BLOCK_SIZE_Y][BLOCK_SIZE_X];
 
 	//Load the images into shared memory
-	if (y<m_iImgHeight && x<m_iImgWidth) {
-		imgR_sh[ty][tx] = m_dImg1[y*m_iImgWidth + x];
-		imgT_sh[ty][tx] = m_dImg2[y*m_iImgWidth + x];
+	if (y < iImgHeight && x < iImgWidth) {
+		img_sh[ty][tx] = d_Img[y*iImgWidth + x];
 	}
-	__syncthreads();	//guarntee all the threads complete their work in a block
 
-						//Compute the gradients within the whole image, with 1-pixel shrinked on each boundary
-	if (y >= 1 && y<m_iImgHeight - 1 && x >= 1 && x<m_iImgWidth - 1 &&
+	//guarntee all the threads complete their work in a block
+	__syncthreads();
+
+	//Compute the gradients within the whole image, with 1-pixel shrinked on each boundary
+	if (y >= 1 && y < iImgHeight - 1 && x >= 1 && x < iImgWidth - 1 &&
 		tx != 0 && tx != BLOCK_SIZE_X - 1 && ty != 0 && ty != BLOCK_SIZE_Y - 1) {
-		m_dR[(y - 1)*m_iWidth + x - 1] = imgR_sh[ty][tx];
-		m_dRx[(y - 1)*m_iWidth + x - 1] = 0.5f * (imgR_sh[ty][tx + 1] - imgR_sh[ty][tx - 1]);
-		m_dRy[(y - 1)*m_iWidth + x - 1] = 0.5f * (imgR_sh[ty + 1][tx] - imgR_sh[ty - 1][tx]);
-
-		m_dT[(y - 1)*m_iWidth + x - 1] = imgT_sh[ty][tx];
-		m_dTx[(y - 1)*m_iWidth + x - 1] = 0.5f * (imgT_sh[ty][tx + 1] - imgT_sh[ty][tx - 1]);
-		m_dTy[(y - 1)*m_iWidth + x - 1] = 0.5f * (imgT_sh[ty + 1][tx] - imgT_sh[ty - 1][tx]);
-		m_dTxy[(y - 1)*m_iWidth + x - 1] = 0.25 * (imgT_sh[ty + 1][tx + 1] - imgT_sh[ty - 1][tx + 1] - imgT_sh[ty + 1][tx - 1] + imgT_sh[ty - 1][tx - 1]);
+		d_Gx[(y - 1)*iWidth + x - 1] = 0.5f * (img_sh[ty][tx + 1] - img_sh[ty][tx - 1]);
+		d_Gy[(y - 1)*iWidth + x - 1] = 0.5f * (img_sh[ty + 1][tx] - img_sh[ty - 1][tx]);
+		d_Gxy[(y - 1)*iWidth + x - 1] = 0.25 * (img_sh[ty + 1][tx + 1] - img_sh[ty - 1][tx + 1] - img_sh[ty + 1][tx - 1] + img_sh[ty - 1][tx - 1]);
 	}
 }
 
-void runTest()
+void gradientTest()
 {
+	int iImgWidth = 512, iImgHeight = 512;
+	int iWidth = 510, iHeight = 510;
+	int iImgSize = iImgWidth * iImgHeight * sizeof(float);
+	int iSize = iWidth * iHeight * sizeof(float);
+	dim3 threads(BLOCK_SIZE_X, BLOCK_SIZE_Y);
+	dim3 blocks((int)ceil((float)iImgWidth / (BLOCK_SIZE_X - 2)), (int)ceil((float)iImgHeight / (BLOCK_SIZE_Y - 2)));
+
+	float *h_Img, *d_Img, *d_Gx, *d_Gy, *d_Gxy;
+	h_Img = (float*)malloc(iImgSize);
+
+	for (int i = 0; i < iImgWidth * iImgHeight; i++)
+	{
+		h_Img[i] = float(rand() % 256);
+	}
 	
+	cudaMalloc((void**)&d_Img, iImgSize);
+	cudaMalloc((void**)&d_Gx, iSize);
+	cudaMalloc((void**)&d_Gy, iSize);
+	cudaMalloc((void**)&d_Gxy, iSize);
+
+	cudaMemcpy(d_Img, h_Img, iImgSize, cudaMemcpyHostToDevice);
+
+	cudaEvent_t start, k1, end;
+	cudaEventCreate(&start);
+	cudaEventCreate(&k1);
+	cudaEventCreate(&end);
+
+	cudaEventRecord(start);
+	gradient_kernel<<<(iImgWidth*iImgHeight + BLOCK_SIZE-1)/BLOCK_SIZE, BLOCK_SIZE>>>(d_Img, 
+		iHeight, iWidth, iImgHeight, iImgWidth, 
+		d_Gx, d_Gy, d_Gxy);
+	cudaEventRecord(k1);
+	gradient_kernel_optimized<<<blocks, threads>>>(d_Img,
+		iHeight, iWidth, iImgHeight, iImgWidth,
+		d_Gx, d_Gy, d_Gxy);
+	cudaEventRecord(end);
+	cudaEventSynchronize(end);
+
+	float t1, t2;
+	cudaEventElapsedTime(&t1, start, k1);
+	cudaEventElapsedTime(&t2, k1, end);
+
+	std::cout << "Image gradient calculation of " << iImgHeight << " x " << iImgWidth << " time: " << t1 << std::endl;
+	std::cout << "Optimized image gradient calculation of " << iImgHeight << " x " << iImgWidth << " time: " << t2 << std::endl;
 }

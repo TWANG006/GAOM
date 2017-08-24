@@ -3,6 +3,7 @@
 #include <cuda_runtime.h>
 #include "vec_add.h"
 #include "vec_add.cuh"
+#include "grad_calc.cuh"
 
 typedef std::chrono::high_resolution_clock Time;
 typedef std::chrono::milliseconds ms;
@@ -61,7 +62,8 @@ void test_vecAdd()
 
 int main()
 {
-	test_vecAdd();
+	//test_vecAdd();
+	gradientTest();
 
 	return 0;
 }
