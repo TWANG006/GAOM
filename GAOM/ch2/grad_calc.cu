@@ -11,8 +11,7 @@ __global__ void gradient_kernel(float *d_Img, int iHeight, int iWidth,
 	int tid = blockIdx.x*blockDim.x + threadIdx.x;
 	int i = tid / iWidth;
 	int j = tid % iWidth;
-	if (tid < iWidth*iHeight)
-	{
+	if (tid < iWidth*iHeight){
 		d_Gx[tid] = 0.5*(d_Img[iImgWidth*(i + 1) + j + 2] - d_Img[iImgWidth*(i + 1) + j]);
 		d_Gy[tid] = 0.5*(d_Img[iImgWidth*(i + 2) + j + 1] - d_Img[iImgWidth*(i)+j + 1]);
 		d_Gxy[tid] = 0.25*(d_Img[iImgWidth*(i + 2) + j + 2] - d_Img[iImgWidth*(i)+j + 2] -
@@ -97,6 +96,19 @@ void gradientTest()
 	cudaEventElapsedTime(&t1, start, k1);
 	cudaEventElapsedTime(&t2, k1, end);
 
-	std::cout << "Image gradient calculation of " << iImgHeight << " x " << iImgWidth << " time: " << t1 << std::endl;
-	std::cout << "Optimized image gradient calculation of " << iImgHeight << " x " << iImgWidth << " time: " << t2 << std::endl;
+	std::cout << "Image gradient calculation of " << iImgHeight << " x " 
+		<< iImgWidth << " time: " << t1 << std::endl;
+	std::cout << "Optimized image gradient calculation of " << iImgHeight << " x " 
+		<< iImgWidth << " time: " << t2 << std::endl;
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(k1);
+	cudaEventDestroy(end);
+
+	cudaFree(d_Img);
+	cudaFree(d_Gx);
+	cudaFree(d_Gy);
+	cudaFree(d_Gxy);
+
+	free(h_Img); h_Img = nullptr;
 }
