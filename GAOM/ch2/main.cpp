@@ -1,13 +1,8 @@
-#include <iostream>
-#include <chrono>
 #include <cuda_runtime.h>
+#include "common.h"
 #include "vec_add.h"
 #include "vec_add.cuh"
 #include "grad_calc.cuh"
-
-typedef std::chrono::high_resolution_clock Time;
-typedef std::chrono::milliseconds ms;
-typedef std::chrono::duration<float> fsec;
 
 using namespace std;
 using namespace chrono;

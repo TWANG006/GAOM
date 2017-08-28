@@ -18,36 +18,5 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vec_add.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="grad_calc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="grad_calc.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="vec_add.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="grad_calc.cuh">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vec_add.cuh">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vec_add.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="grad_calc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

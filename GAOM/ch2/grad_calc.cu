@@ -1,6 +1,8 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 #include "grad_calc.cuh"
+#include "grad_calc.h"
+#include "common.h"
 
 #include <iostream>
 
@@ -61,8 +63,18 @@ void gradientTest()
 	dim3 threads(BLOCK_SIZE_X, BLOCK_SIZE_Y);
 	dim3 blocks((int)ceil((float)iImgWidth / (BLOCK_SIZE_X - 2)), (int)ceil((float)iImgHeight / (BLOCK_SIZE_Y - 2)));
 
-	float *h_Img, *d_Img, *d_Gx, *d_Gy, *d_Gxy;
+	float *h_Img, *d_Img, *h_Gx, *h_Gy, *h_Gxy, *d_Gx, *d_Gy, *d_Gxy;
+	
 	h_Img = (float*)malloc(iImgSize);
+	h_Gx = (float*)malloc(iSize);
+	h_Gy = (float*)malloc(iSize);
+	h_Gxy = (float*)malloc(iSize);
+
+	// Accuracy verification
+	float *h_tGx, *h_tGy, *h_tGxy;
+	h_tGx = (float*)malloc(iSize);
+	h_tGy = (float*)malloc(iSize);
+	h_tGxy = (float*)malloc(iSize);
 
 	for (int i = 0; i < iImgWidth * iImgHeight; i++)
 	{
@@ -74,11 +86,21 @@ void gradientTest()
 	cudaMalloc((void**)&d_Gy, iSize);
 	cudaMalloc((void**)&d_Gxy, iSize);
 
+	// Host time
+	auto time1 = Time::now();
+	gradient(h_Img, iImgWidth, iImgHeight, h_Gx, h_Gy, h_Gxy);
+	auto time2 = Time::now();
+	fsec hostTime = time2 - time1;
+	std::cout << "Host Image gradient calculation of " << iImgHeight << " x "
+		<< iImgWidth << " time: " << hostTime.count()*1000.0 << std::endl;
+
+	// Device time
 	cudaMemcpy(d_Img, h_Img, iImgSize, cudaMemcpyHostToDevice);
 
-	cudaEvent_t start, k1, end;
+	cudaEvent_t start, k1, k2, end;
 	cudaEventCreate(&start);
 	cudaEventCreate(&k1);
+	cudaEventCreate(&k2);
 	cudaEventCreate(&end);
 
 	cudaEventRecord(start);
@@ -86,23 +108,69 @@ void gradientTest()
 		iHeight, iWidth, iImgHeight, iImgWidth, 
 		d_Gx, d_Gy, d_Gxy);
 	cudaEventRecord(k1);
+	cudaEventSynchronize(k1);
+	
+	cudaMemcpy(h_tGx, d_Gx, iSize, cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_tGy, d_Gy, iSize, cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_tGxy, d_Gxy, iSize, cudaMemcpyDeviceToHost);
+
+	bool passed = true;
+	for (int i = 0; i < 10; i++)
+	{
+		if (!(h_tGx[i] - h_Gx[i] <= 1e-6 &&
+			h_tGy[i] - h_Gy[i] <= 1e-6 &&
+			h_tGxy[i] - h_Gxy[i] <= 1e-6))
+		{
+			passed = false;
+		}
+	}
+
+	if (passed) {
+		float t1;
+		cudaEventElapsedTime(&t1, start, k1);
+
+		std::cout << "Image gradient calculation of " << iImgHeight << " x "
+			<< iImgWidth << " time: " << t1 << std::endl;
+	}
+	else
+	{
+		std::cout << "Incorrect Results: kernel 1." << std::endl;
+	}
+
+	cudaEventRecord(k2);
 	gradient_kernel_optimized<<<blocks, threads>>>(d_Img,
 		iHeight, iWidth, iImgHeight, iImgWidth,
 		d_Gx, d_Gy, d_Gxy);
 	cudaEventRecord(end);
 	cudaEventSynchronize(end);
 
-	float t1, t2;
-	cudaEventElapsedTime(&t1, start, k1);
-	cudaEventElapsedTime(&t2, k1, end);
+	cudaMemcpy(h_tGx, d_Gx, iSize, cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_tGy, d_Gy, iSize, cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_tGxy, d_Gxy, iSize, cudaMemcpyDeviceToHost);
 
-	std::cout << "Image gradient calculation of " << iImgHeight << " x " 
-		<< iImgWidth << " time: " << t1 << std::endl;
-	std::cout << "Optimized image gradient calculation of " << iImgHeight << " x " 
-		<< iImgWidth << " time: " << t2 << std::endl;
+	passed = true;
+	for (int i = 0; i < 10; i++)
+	{
+		if (!(h_tGx[i] - h_Gx[i] <= 1e-6 &&
+			h_tGy[i] - h_Gy[i] <= 1e-6 &&
+			h_tGxy[i] - h_Gxy[i] <= 1e-6))
+		{
+			passed = false;
+		}
+	}
+	if (passed) {
 
+		float t2;
+		cudaEventElapsedTime(&t2, k2, end);
+		std::cout << "Optimized image gradient calculation of " << iImgHeight << " x "
+			<< iImgWidth << " time: " << t2 << std::endl;
+	}
+	
+
+	// Memory deallocation
 	cudaEventDestroy(start);
 	cudaEventDestroy(k1);
+	cudaEventDestroy(k2);
 	cudaEventDestroy(end);
 
 	cudaFree(d_Img);
@@ -111,4 +179,10 @@ void gradientTest()
 	cudaFree(d_Gxy);
 
 	free(h_Img); h_Img = nullptr;
+	free(h_Gx); h_Gx = nullptr;
+	free(h_Gy); h_Gy = nullptr;
+	free(h_Gxy); h_Gxy = nullptr;
+	free(h_tGx); h_tGx = nullptr;
+	free(h_tGy); h_tGy = nullptr;
+	free(h_tGxy); h_tGxy = nullptr;
 }
