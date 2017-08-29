@@ -143,7 +143,8 @@ void icgn_gpu_prepare(ICGN_d_Handle& m_Handle,
 	const int &m_iImgWidth, const int &m_iImgHeight,
 	const int &m_iSubsetX, const int &m_iSubsetY,
 	const int &m_iMarginX, const int &m_iMarginY,
-	const int &m_iGridSpaceX, const int &m_iGridSpaceY)
+	const int &m_iGridSpaceX, const int &m_iGridSpaceY, 
+	Timer &m_Time)
 {
 	m_Handle.m_iImgWidth = m_iImgWidth;
 	m_Handle.m_iImgHeight = m_iImgHeight;
@@ -167,6 +168,8 @@ void icgn_gpu_prepare(ICGN_d_Handle& m_Handle,
 	int m_iImgsize = m_Handle.m_iHeight*m_Handle.m_iWidth;
 	int m_iNumSize = m_Handle.m_iNumberY*m_Handle.m_iNumberX;
 	int m_iSubwindowSize = m_Handle.m_iSubsetW*m_Handle.m_iSubsetH;
+
+	double t_start = omp_get_wtime();
 	cudaMalloc((void**)&m_Handle.m_d_dImg1, sizeof(float)*m_iImgWidth*m_iImgHeight);
 	cudaMalloc((void**)&m_Handle.m_d_dImg2, sizeof(float)*m_iImgWidth*m_iImgHeight);
 	cudaMalloc((void**)&(m_Handle.m_d_dR), sizeof(float)*m_iImgsize);
@@ -192,6 +195,8 @@ void icgn_gpu_prepare(ICGN_d_Handle& m_Handle,
 	cudaMalloc((void**)&m_Handle.m_d_dSubsetAveR, sizeof(float)*m_iNumSize*(m_iSubwindowSize + 1));
 	cudaMalloc((void**)&m_Handle.m_d_dInvHessian, sizeof(float)*m_iNumSize * 36);
 	cudaMalloc((void**)&m_Handle.m_d_2dRDescent, sizeof(float2) * 3 * m_iSubwindowSize*m_iNumSize);
+	m_Time.m_dDevMemAlloc = (omp_get_wtime() - t_start) * 1000;
+	t_start = omp_get_wtime();
 }
 
 void icgn_gpu_finalize(ICGN_d_Handle &m_Handle, Timer& m_Time)

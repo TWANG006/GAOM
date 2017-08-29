@@ -242,3 +242,5 @@ ModelManifest.xml
 .fake/
 /GAOM/ch3/ICGN_infor.txt
 /GAOM/ch3/ICGN_data.csv
+/GAOM/ch3/fu_1_FFTCC-ICGN_BC_O2_Info.txt
+/GAOM/ch3/fu_1_FFTCC-ICGN_BC_O2_Data.txt

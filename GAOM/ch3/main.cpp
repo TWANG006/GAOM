@@ -76,7 +76,8 @@ void testICGN(cv::Mat& imgR, cv::Mat& imgT)
 		m_iImgWidth, m_iImgHeight,
 		m_iSubsetX, m_iSubsetY,
 		m_iMarginX, m_iMarginY,
-		m_iGridSpaceX, m_iGridSpaceY);
+		m_iGridSpaceX, m_iGridSpaceY,
+		m_Time);
 	icgn_prepare(m_Handle, m_dPXY, m_dP, m_iIterationNum);
 
 	icgn_algorithm(m_dImg1, m_dImg2, m_Handle, m_iMaxIteration, m_dNormDeltaP, m_dPXY, m_dP, m_iIterationNum, m_iIteration, m_Time);
@@ -126,7 +127,9 @@ void testICGN(cv::Mat& imgR, cv::Mat& imgT)
 	oFile << "Interval (Y-axis): " << m_iGridSpaceY << " [pixel]" << endl;
 	oFile << "Number of POI: " << m_iNumberY*m_iNumberX << " = " << m_iNumberX << " X " << m_iNumberY << endl;
 	oFile << "Subset dimension: " << m_iSubsetW << "x" << m_iSubsetH << " pixels" << endl;
+	oFile << "Time for device Mem Allocation: " << m_Time.m_dDevMemAlloc << " [millisec]" << endl;
 	oFile << "Time for copy: " << m_Time.m_dMemCpy << " [millisec]" << endl;
+	oFile << "Time for device Mem Free: " << m_Time.m_dDevMemFree << " [millisec]" << endl;
 	oFile << "Time comsumed: " << m_Time.m_dConsumedTime << " [millisec]" << endl;
 	oFile << "Time for Pre-computation: " << m_Time.m_dPrecomputeTime << " [millisec]" << endl;
 	oFile << "Time for all sub-pixel registration: " << m_Time.m_dICGNTime << " [millisec]" << endl;
@@ -139,7 +142,9 @@ void testICGN(cv::Mat& imgR, cv::Mat& imgT)
 	cout << "Interval (Y-axis): " << m_iGridSpaceY << " [pixel]" << endl;
 	cout << "Number of POI: " << m_iNumberY*m_iNumberX << " = " << m_iNumberX << " X " << m_iNumberY << endl;
 	cout << "Subset dimension: " << m_iSubsetW << "x" << m_iSubsetH << " pixels" << endl;
+	cout << "Time for device Mem Allocation: " << m_Time.m_dDevMemAlloc << " [millisec]" << endl;
 	cout << "Time for copy: " << m_Time.m_dMemCpy << " [millisec]" << endl;
+	cout << "Time for device Mem Free: " << m_Time.m_dDevMemFree << " [millisec]" << endl;
 	cout << "Time comsumed: " << m_Time.m_dConsumedTime << " [millisec]" << endl;
 	cout << "Time for Pre-computation: " << m_Time.m_dPrecomputeTime << " [millisec]" << endl;
 	cout << "Time for all sub-pixel registration: " << m_Time.m_dICGNTime << " [millisec]" << endl;

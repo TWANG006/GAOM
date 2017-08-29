@@ -78,7 +78,8 @@ void icgn_gpu_prepare(ICGN_d_Handle& m_Handle,
 	const int &m_iImgWidth, const int &m_iImgHeight,
 	const int &m_iSubsetX, const int &m_iSubsetY,
 	const int &m_iMarginX, const int &m_iMarginY,
-	const int &m_iGridSpaceX, const int &m_iGridSpaceY);
+	const int &m_iGridSpaceX, const int &m_iGridSpaceY,
+	Timer&m_Time);
 
 void icgn_gpu_finalize(ICGN_d_Handle &m_Handle, Timer& m_Time);
 
