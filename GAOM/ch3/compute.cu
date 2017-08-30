@@ -59,17 +59,18 @@ void icgn_algorithm(float ** m_dImg1, float ** m_dImg2,
 
 	float* w_d_dP = m_Handle.m_d_dP;
 	int *m_d_iIterationNum = m_Handle.m_d_iIterationNum;
-	cudaEvent_t start, cp1, pre, icgn, cp2;
+	cudaEvent_t start, cp1, pre, hessian, icgn, cp2;
 	cudaEventCreate(&start);
 	cudaEventCreate(&cp1);
 	cudaEventCreate(&pre);
+	cudaEventCreate(&hessian);
 	cudaEventCreate(&icgn);
 	cudaEventCreate(&cp2);
 	
 	// Copy the images to device
 	cudaEventRecord(start);
-	cudaMemcpyAsync(m_d_dImg1, m_dImg1[0], sizeof(float)*m_iImgWidth*m_iImgHeight, cudaMemcpyHostToDevice);
-	cudaMemcpyAsync(m_d_dImg2, m_dImg2[0], sizeof(float)*m_iImgWidth*m_iImgHeight, cudaMemcpyHostToDevice);
+	cudaMemcpy(m_d_dImg1, m_dImg1[0], sizeof(float)*m_iImgWidth*m_iImgHeight, cudaMemcpyHostToDevice);
+	cudaMemcpy(m_d_dImg2, m_dImg2[0], sizeof(float)*m_iImgWidth*m_iImgHeight, cudaMemcpyHostToDevice);
 	cudaEventRecord(cp1);
 
 	// Precomputation starts
@@ -79,15 +80,18 @@ void icgn_algorithm(float ** m_dImg1, float ** m_dImg2,
 
 	// ICGN
 	all_gpu_cu_prepare_Hessian_all_iteration(m_Handle);
+
+	cudaEventRecord(hessian);
+
 	all_gpu_main_icgn_process_all_iteration(m_Handle,
 		m_iMaxIteration,
 		m_dNormDeltaP);
 	cudaEventRecord(icgn);
 
-	cudaMemcpyAsync(m_iIterationNum[0], m_d_iIterationNum, sizeof(int)*m_iNumSize, cudaMemcpyDeviceToHost);
-	cudaMemcpyAsync(m_dP[0][0], w_d_dP, sizeof(float)*m_iNumSize * 6, cudaMemcpyDeviceToHost);
+	cudaMemcpy(m_iIterationNum[0], m_d_iIterationNum, sizeof(int)*m_iNumSize, cudaMemcpyDeviceToHost);
+	cudaMemcpy(m_dP[0][0], w_d_dP, sizeof(float)*m_iNumSize * 6, cudaMemcpyDeviceToHost);
 	m_iIteration = 0;
-	cudaMemcpyAsync(m_dPXY[0][0], m_Handle.m_d_dPXY, sizeof(int)*m_iNumSize * 2, cudaMemcpyDeviceToHost);
+	cudaMemcpy(m_dPXY[0][0], m_Handle.m_d_dPXY, sizeof(int)*m_iNumSize * 2, cudaMemcpyDeviceToHost);
 	cudaEventRecord(cp2);
 	cudaDeviceSynchronize();
 	for (int i = 0; i < m_iNumberY; i++)
@@ -97,17 +101,18 @@ void icgn_algorithm(float ** m_dImg1, float ** m_dImg2,
 			m_iIteration += m_iIterationNum[i][j];
 		}
 	}
-	float t_cp1, t_pre, t_icgn, t_cp2;
+	float t_cp1, t_pre, t_hessian, t_icgn, t_cp2;
 
 	cudaEventElapsedTime(&t_cp1, start, cp1);
 	cudaEventElapsedTime(&t_pre, cp1, pre);
-	cudaEventElapsedTime(&t_icgn, pre, icgn);
+	cudaEventElapsedTime(&t_hessian, pre, hessian );
+	cudaEventElapsedTime(&t_icgn, hessian, icgn);
 	cudaEventElapsedTime(&t_cp2, icgn, cp2);
 
 	t_whole = (omp_get_wtime() - t_whole) * 1000;
 	m_Time.m_dConsumedTime = t_whole;
 	m_Time.m_dMemCpy = t_cp1 + t_cp2;
-	m_Time.m_dPrecomputeTime = t_pre;
+	m_Time.m_dPrecomputeTime = t_pre + t_hessian;
 	m_Time.m_dICGNTime = t_icgn;
 }
 

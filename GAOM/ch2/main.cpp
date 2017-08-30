@@ -9,17 +9,17 @@ using namespace chrono;
 
 void test_vecAdd()
 {
-	int n = 1000000;
+	int n = 10000000;
 
 	float *A, *B, *C;
 
 	auto t1 = Time::now();
-	/*cudaHostAlloc((void**)&A, n * sizeof(float), cudaHostAllocDefault);
+	cudaHostAlloc((void**)&A, n * sizeof(float), cudaHostAllocDefault);
 	cudaHostAlloc((void**)&B, n * sizeof(float), cudaHostAllocDefault);
-	cudaHostAlloc((void**)&C, n * sizeof(float), cudaHostAllocDefault);*/
-	A = (float*)malloc(sizeof(float) * n);
+	cudaHostAlloc((void**)&C, n * sizeof(float), cudaHostAllocDefault);
+	/*A = (float*)malloc(sizeof(float) * n);
 	B = (float*)malloc(sizeof(float) * n);
-	C = (float*)malloc(sizeof(float) * n);
+	C = (float*)malloc(sizeof(float) * n);*/
 	auto t2 = Time::now();
 	fsec ma = t2 - t1;
 
@@ -38,12 +38,12 @@ void test_vecAdd()
 	vecAdd(A, B, C, n);
 
 	auto t5 = Time::now();
-	/*cudaFreeHost(A);
+	cudaFreeHost(A);
 	cudaFreeHost(B);
-	cudaFreeHost(C);*/
-	free(A); A = nullptr;
+	cudaFreeHost(C);
+	/*free(A); A = nullptr;
 	free(B); B = nullptr;
-	free(C); C = nullptr;
+	free(C); C = nullptr;*/
 	auto t6 = Time::now();
 
 	fsec md = t6 - t5;
@@ -57,7 +57,7 @@ void test_vecAdd()
 
 int main()
 {
-	//test_vecAdd();
+	test_vecAdd();
 	gradientTest();
 
 	return 0;
