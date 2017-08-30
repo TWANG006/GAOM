@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="CUDA">
+      <UniqueIdentifier>{8cdf6a49-3620-4d1f-929c-c04bf8dd7e63}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -23,16 +26,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="precomputation.cuh">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="icgn.cuh">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="reducer.cuh">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TW_MemManager.h">
@@ -41,16 +35,25 @@
     <ClInclude Include="compute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="reducer.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="precomputation.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="icgn.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="precomputation.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
     <CudaCompile Include="icgn.cu">
-      <Filter>Source Files</Filter>
+      <Filter>CUDA</Filter>
     </CudaCompile>
     <CudaCompile Include="compute.cu">
-      <Filter>Source Files</Filter>
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="precomputation.cu">
+      <Filter>CUDA</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

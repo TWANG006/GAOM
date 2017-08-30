@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="CUDA">
+      <UniqueIdentifier>{b47acdf6-3d8d-4301-8258-5d37e996efbe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,19 +30,13 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="grad_calc.cu">
-      <Filter>Source Files</Filter>
+      <Filter>CUDA</Filter>
     </CudaCompile>
     <CudaCompile Include="vec_add.cu">
-      <Filter>Source Files</Filter>
+      <Filter>CUDA</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="grad_calc.cuh">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vec_add.cuh">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="vec_add.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -48,6 +45,12 @@
     </ClInclude>
     <ClInclude Include="common.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="grad_calc.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="vec_add.cuh">
+      <Filter>CUDA</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
