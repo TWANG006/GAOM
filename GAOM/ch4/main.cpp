@@ -1,8 +1,8 @@
-#include "WFF.h"
+#include "test.h"
 
 int main()
 {
-	cudaFree(0);
+	WFF_Test();
 
 	return 0;
 }

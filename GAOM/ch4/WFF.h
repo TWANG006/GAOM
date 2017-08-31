@@ -3,7 +3,10 @@
 
 
 #include <chrono>
+#include <sstream>
+#include <fstream>
 #include <iostream>
+#include <algorithm>
 #include <vector>
 #include <cuda_runtime.h>
 #include <cufft.h>
@@ -16,11 +19,10 @@ typedef std::chrono::high_resolution_clock Time;
 typedef std::chrono::milliseconds ms;
 typedef std::chrono::duration<float> fsec;
 
-#define BLOCK_SIZE_256 256
-#define BLOCK_SIZE_128 128
-#define BLOCK_SIZE_64 64
-#define BLOCK_SIZE_X 16
-#define BLOCK_SIZE_Y 16
+const int BLOCK_SIZE_256 = 256;
+const int BLOCK_SIZE_128 = 128;
+const int BLOCK_SIZE_64 = 64;
+const int BLOCK_SIZE_16 = 16;
 
 /* This is the LUT of the optimized FFT size based on the following 3  *
 * features:														   *
@@ -48,7 +50,6 @@ const std::vector<int> OPT_FFT_SIZE = {
 /* Sginle precision Data structure for CUDA WFT Results */
 struct WFT2_DeviceResultsF
 {
-
 	/* For WFF */
 	// 2D filtered signal
 	// phase = angle(m_h_filtered) for fI and fIII
