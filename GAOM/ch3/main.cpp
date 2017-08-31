@@ -15,8 +15,8 @@ int main()
 {
 	// The difference between these two images are simulated to be 0.05 pixels displacement
 	// along the x axis
-	cv::Mat Rmat = cv::imread("fu_0.bmp");
-	cv::Mat Tmat = cv::imread("fu_1.bmp");
+	cv::Mat Rmat = cv::imread("Test\\fu_0.bmp");
+	cv::Mat Tmat = cv::imread("Test\\fu_1.bmp");
 
 	auto wm_iWidth = Rmat.cols;
 	auto wm_iHeight = Rmat.rows;
@@ -100,7 +100,7 @@ void testICGN(cv::Mat& imgR, cv::Mat& imgT)
 	
 	// Output results
 	ofstream oFile;
-	oFile.open("ICGN_data.csv", ios::out | ios::trunc);
+	oFile.open("Test\\ICGN_data.csv", ios::out | ios::trunc);
 	oFile << "X" << ", \t" << "Y" << ", \t" << "U" << ", \t" << "Ux" << ", \t" << "Uy"
 		<< ", \t" << "V" << ", \t" << "Vx" << ", \t" << "Vy" << ", \t"
 		<< "Interation" << ", \t" << endl;
@@ -121,7 +121,7 @@ void testICGN(cv::Mat& imgR, cv::Mat& imgT)
 	icgn_gpu_finalize(m_Handle, m_Time);
 	icgn_finalize(m_dPXY, m_dP, m_iIterationNum);
 
-	oFile.open("ICGN_infor.txt", ios::out | ios::trunc);
+	oFile.open("Test\\ICGN_infor.txt", ios::out | ios::trunc);
 
 	oFile << "Interval (X-axis): " << m_iGridSpaceX << " [pixel]" << endl;
 	oFile << "Interval (Y-axis): " << m_iGridSpaceY << " [pixel]" << endl;
