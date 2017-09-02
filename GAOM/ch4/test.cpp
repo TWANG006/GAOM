@@ -10,7 +10,7 @@ void WFF_Test()
 {
 	/* Load the complex fringe pattern from disk */
 	cufftComplex *f = nullptr;
-	std::ifstream in("Test\\1024.fp");
+	std::ifstream in("Test\\512.fp");
 	int rows, cols;
 	if (!cufftComplexMatRead2D(in, f, rows, cols))
 		std::cout << "load error" << std::endl;
@@ -37,7 +37,7 @@ void WFF_Test()
 	checkCudaErrors(cudaMemcpy(h_zfiltered, z.m_d_filtered, sizeof(cufftComplex) *cols * rows, cudaMemcpyDeviceToHost));
 
 	std::ofstream out;
-	out.open("Test\\z_filtered.csv", std::ios::out | std::ios::trunc);
+	out.open("Test\\z_filtered_512.csv", std::ios::out | std::ios::trunc);
 
 	for (int i = 0; i < rows; i++)
 	{
