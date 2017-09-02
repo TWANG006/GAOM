@@ -539,18 +539,18 @@ void WFF2_CUDAF::cuWFF2(cufftComplex *d_f, WFT2_DeviceResultsF &d_z, double &tim
 			complex_pointwise_multiplication_kernel <<<blocks1D, BLOCK_SIZE_256>> > (
 				m_d_fPadded, im_d_Fg, m_iPaddedHeight*m_iPaddedWidth, im_d_Sf);
 			getLastCudaError("complex_pointwise_multiplication_kernel Launch Failed!");
-			checkCudaErrors(cufftExecC2C(m_plan, im_d_Sf, im_d_Sf, CUFFT_INVERSE));
+			checkCudaErrors(cufftExecC2C(m_planPadded, im_d_Sf, im_d_Sf, CUFFT_INVERSE));
 
 			// Threshold the sf: sf=sf.*(abs(sf)>=thr); 
 			threshold_sf_kernel <<<blocksPadded, threads>>> (im_d_Sf, m_iWidth, m_iHeight, m_iPaddedWidth, m_iPaddedHeight, m_rThr);
 			getLastCudaError("threshold_sf_kernel Launch Failed!");
 
 			// implement of IWFT: conv2(sf,w);
-			checkCudaErrors(cufftExecC2C(m_plan, im_d_Sf, im_d_Sf, CUFFT_FORWARD));
+			checkCudaErrors(cufftExecC2C(m_planPadded, im_d_Sf, im_d_Sf, CUFFT_FORWARD));
 			complex_pointwise_multiplication_kernel <<<blocks1D, BLOCK_SIZE_256 >>> (
 				im_d_Sf, im_d_Fg, m_iPaddedHeight*m_iPaddedWidth, im_d_Sf);
 			getLastCudaError("complex_pointwise_multiplication_kernel Launch Failed!");
-			checkCudaErrors(cufftExecC2C(m_plan, im_d_Sf, im_d_Sf, CUFFT_INVERSE));
+			checkCudaErrors(cufftExecC2C(m_planPadded, im_d_Sf, im_d_Sf, CUFFT_INVERSE));
 
 			// Update partial results im_d_filtered
 			update_WFF_partial_filtered_kernel <<<blocksImg, threads >>> (im_d_Sf, m_iWidth, m_iHeight, m_iPaddedWidth, m_iPaddedHeight, im_d_filtered);
@@ -643,11 +643,8 @@ void WFF2_CUDAF::cuWFF2_Init(WFT2_DeviceResultsF &d_z)
 	checkCudaErrors(cudaMalloc((void**)&im_d_Fg, sizeof(cufftComplex)*iPaddedSize));
 	checkCudaErrors(cudaMalloc((void**)&im_d_filtered, sizeof(cufftComplex)*iPaddedSize));
 	checkCudaErrors(cudaMalloc((void**)&im_d_Sf, sizeof(cufftComplex)*iPaddedSize));
-
-	// 2. Make cufft C2C plan
-	checkCudaErrors(cufftPlan2d(&m_plan, m_iPaddedHeight, m_iPaddedWidth, CUFFT_C2C));
 	
-
+	// 2. Calculate threshold
 	if (m_rThr <= 1e-6)
 	{
 		checkCudaErrors(cudaMalloc((void**)&m_d_rThr, sizeof(float)));

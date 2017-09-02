@@ -55,8 +55,6 @@ private:
 
 	cufftHandle		m_planPadded;
 
-	cufftHandle		m_plan;
-
 	/* Intermediate Results */
 	cufftComplex	*im_d_Fg;					// Explicitly computed Fg in Fourier Domain
 	cufftComplex	*im_d_Sf;
