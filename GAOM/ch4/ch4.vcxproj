@@ -10,11 +10,30 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common.h" />
+    <ClInclude Include="compute.h" />
+    <ClInclude Include="helper_cuda.h" />
+    <ClInclude Include="icgn.cuh" />
+    <ClInclude Include="precomputation.cuh" />
+    <ClInclude Include="reducer.cuh" />
+    <ClInclude Include="TW_MemManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="compute.cu" />
+    <CudaCompile Include="icgn.cu" />
+    <CudaCompile Include="precomputation.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="TW_MemManager.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E840754A-B8C1-42E5-BC65-72B00E8D585B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ch4</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>ch4</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -95,26 +114,6 @@
       <CodeGeneration>compute_30,sm_30</CodeGeneration>
     </CudaCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="test.cpp" />
-    <ClCompile Include="utils.cpp" />
-    <ClCompile Include="WFF.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="cu_wff.h" />
-    <ClInclude Include="helper_cuda.h" />
-    <ClInclude Include="mem_manager.h" />
-    <ClInclude Include="test.h" />
-    <ClInclude Include="utils.h" />
-    <ClInclude Include="WFF.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="mem_manager.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="cu_wff.cu" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 8.0.targets" />

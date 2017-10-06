@@ -1,0 +1,11 @@
+Interval (X-axis): 5 [pixel]
+Interval (Y-axis): 5 [pixel]
+Number of POI: 9025 = 95 X 95
+Subset dimension: 33x33 pixels
+Time for device Mem Allocation: 33.6787 [millisec]
+Time for copy: 0.744032 [millisec]
+Time for device Mem Free: 9.83613 [millisec]
+Time comsumed: 41.7416 [millisec]
+Time for Pre-computation: 12.7592 [millisec]
+Time for all sub-pixel registration: 20.0417 [millisec]
+Time for sub-pixel registration: 0.00222069 [millisec] for average iteration steps of 3.47147

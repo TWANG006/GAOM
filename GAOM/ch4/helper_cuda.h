@@ -278,10 +278,6 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorApiFailureBase:
             return "cudaErrorApiFailureBase";
-
-        /* Since CUDA 8.0*/        
-        case cudaErrorNvlinkUncorrectable :   
-            return "cudaErrorNvlinkUncorrectable";
     }
 
     return "<unknown>";
@@ -380,9 +376,6 @@ static const char *_cudaGetErrorEnum(CUresult error)
 
         case CUDA_ERROR_INVALID_GRAPHICS_CONTEXT:
             return "CUDA_ERROR_INVALID_GRAPHICS_CONTEXT";
-
-        case CUDA_ERROR_NVLINK_UNCORRECTABLE:
-            return "CUDA_ERROR_NVLINK_UNCORRECTABLE";
 
         case CUDA_ERROR_INVALID_SOURCE:
             return "CUDA_ERROR_INVALID_SOURCE";
@@ -570,9 +563,6 @@ static const char *_cudaGetErrorEnum(cufftResult error)
 
         case CUFFT_LICENSE_ERROR:
             return "CUFFT_LICENSE_ERROR";
-
-        case CUFFT_NOT_SUPPORTED:
-            return "CUFFT_NOT_SUPPORTED";
     }
 
     return "<unknown>";
@@ -955,14 +945,6 @@ static const char *_cudaGetErrorEnum(NppStatus error)
             return "NPP_DIVIDE_BY_ZERO_WARNING";
 #endif
 
-#if ((NPP_VERSION_MAJOR << 12) + (NPP_VERSION_MINOR << 4)) >= 0x7000
-        /* These are 7.0 or higher */
-        case NPP_OVERFLOW_ERROR:
-            return "NPP_OVERFLOW_ERROR";
-
-        case NPP_CORRUPTED_DATA_ERROR:
-            return "NPP_CORRUPTED_DATA_ERROR";
-#endif
     }
 
     return "<unknown>";
@@ -982,7 +964,6 @@ static const char *_cudaGetErrorEnum(NppStatus error)
 template< typename T >
 void check(T result, char const *const func, const char *const file, int const line)
 {
-#if defined(DEBUG) || defined(_DEBUG)
     if (result)
     {
         fprintf(stderr, "CUDA error at %s:%d code=%d(%s) \"%s\" \n",
@@ -991,7 +972,6 @@ void check(T result, char const *const func, const char *const file, int const l
         // Make sure we call CUDA Device Reset before exiting
         exit(EXIT_FAILURE);
     }
-#endif
 }
 
 #ifdef __DRIVER_TYPES_H__
@@ -1003,7 +983,6 @@ void check(T result, char const *const func, const char *const file, int const l
 
 inline void __getLastCudaError(const char *errorMessage, const char *file, const int line)
 {
-#if defined(DEBUG) || defined(_DEBUG)
     cudaError_t err = cudaGetLastError();
 
     if (cudaSuccess != err)
@@ -1013,7 +992,6 @@ inline void __getLastCudaError(const char *errorMessage, const char *file, const
         DEVICE_RESET
         exit(EXIT_FAILURE);
     }
-#endif
 }
 #endif
 
@@ -1047,10 +1025,6 @@ inline int _ConvertSMVer2Cores(int major, int minor)
         { 0x37, 192}, // Kepler Generation (SM 3.7) GK21x class
         { 0x50, 128}, // Maxwell Generation (SM 5.0) GM10x class
         { 0x52, 128}, // Maxwell Generation (SM 5.2) GM20x class
-        { 0x53, 128}, // Maxwell Generation (SM 5.3) GM20x class
-        { 0x60, 64 }, // Pascal Generation (SM 6.0) GP100 class
-        { 0x61, 128}, // Pascal Generation (SM 6.1) GP10x class
-        { 0x62, 128}, // Pascal Generation (SM 6.2) GP10x class
         {   -1, -1 }
     };
 

@@ -18,47 +18,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WFF.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="WFF.h">
+    <ClInclude Include="common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mem_manager.h">
+    <ClInclude Include="compute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="helper_cuda.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cu_wff.h">
+    <ClInclude Include="TW_MemManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="reducer.cuh">
+      <Filter>CUDA</Filter>
     </ClInclude>
-    <ClInclude Include="test.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="icgn.cuh">
+      <Filter>CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="precomputation.cuh">
+      <Filter>CUDA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="mem_manager.inl">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="cu_wff.cu">
+    <CudaCompile Include="compute.cu">
       <Filter>CUDA</Filter>
     </CudaCompile>
+    <CudaCompile Include="icgn.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="precomputation.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TW_MemManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

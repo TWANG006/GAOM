@@ -1,58 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="CUDA">
-      <UniqueIdentifier>{8cdf6a49-3620-4d1f-929c-c04bf8dd7e63}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="WFF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper_cuda.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mem_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cu_wff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="WFF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TW_MemManager.cpp">
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{8081be43-a1f3-43dc-a69f-b5441b9d451b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{a36bd490-25cf-49c5-9896-d7c0fc79c5f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CUDA">
+      <UniqueIdentifier>{9b84a4b4-a67f-4a09-96a5-9b2400ab2c4d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mem_manager.inl">
       <Filter>Source Files</Filter>
-    </ClCompile>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TW_MemManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="compute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="reducer.cuh">
-      <Filter>CUDA</Filter>
-    </ClInclude>
-    <ClInclude Include="precomputation.cuh">
-      <Filter>CUDA</Filter>
-    </ClInclude>
-    <ClInclude Include="icgn.cuh">
-      <Filter>CUDA</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="icgn.cu">
-      <Filter>CUDA</Filter>
-    </CudaCompile>
-    <CudaCompile Include="compute.cu">
-      <Filter>CUDA</Filter>
-    </CudaCompile>
-    <CudaCompile Include="precomputation.cu">
+    <CudaCompile Include="cu_wff.cu">
       <Filter>CUDA</Filter>
     </CudaCompile>
   </ItemGroup>
