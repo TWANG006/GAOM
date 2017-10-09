@@ -24,8 +24,8 @@ void WFF_Test()
 	/* Test the parallel WFF algorithm */
 	WFT2_DeviceResultsF z;
 	WFF2_CUDAF cuwft(cols, rows,
-		20, -1.0f, 1.0f, 0.1f,
-		20, -1.0f, 1.0f, 0.1f, 6,
+		10, -1.0f, 1.0f, 0.1f,
+		10, -1.0f, 1.0f, 0.1f, 5,
 		z);
 	double time = 0;
 	cuwft(df, z, time);
