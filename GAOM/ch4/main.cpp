@@ -16,7 +16,7 @@ int main()
 	// The difference between these two images are simulated to be 0.05 pixels displacement
 	// along the x axis
 	cv::Mat Rmat = cv::imread("Test\\fu_0.bmp");
-	cv::Mat Tmat = cv::imread("Test\\fu_1.bmp");
+	cv::Mat Tmat = cv::imread("Test\\fu_20.bmp");
 
 	auto wm_iWidth = Rmat.cols;
 	auto wm_iHeight = Rmat.rows;
@@ -109,9 +109,9 @@ void testICGN(cv::Mat& imgR, cv::Mat& imgT)
 		for (int j = 0; j < m_iNumberX; j++)
 		{
 			m_iIteration += m_iIterationNum[i][j];
-			oFile << int(m_dPXY[i][j][1]) << ", \t"
-				<< int(m_dPXY[i][j][0]) << ", \t" << m_dP[i][j][0] << ", \t" << m_dP[i][j][1] << ", \t" << m_dP[i][j][2] << ", \t"
-				<< m_dP[i][j][3] << ", \t" << m_dP[i][j][4] << ", \t" << m_dP[i][j][5] << ", \t"
+			oFile << int(m_dPXY[i][j][1]) << ","
+				<< int(m_dPXY[i][j][0]) << "," << m_dP[i][j][0] << "," << m_dP[i][j][1] << "," << m_dP[i][j][2] << ","
+				<< m_dP[i][j][3] << "," << m_dP[i][j][4] << "," << m_dP[i][j][5] << ","
 				<< m_iIterationNum[i][j] << endl;
 		}
 	}
