@@ -96,6 +96,10 @@ private:
 	float			m_rThr;
 	float			*m_d_rThr;
 
+	float m_fCoreTime;
+	float m_fMemTime;
+	float m_fPrecomputeTime;
+
 	/* Parameters for Thread control */
 	int m_iSMs;							// Number of SMs of the device 0
 };

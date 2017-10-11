@@ -29,11 +29,24 @@ void WFF_Test()
 		z);
 	double time = 0;
 	cuwft(df, z, time);
-	cout << "Parallel WFF Running time for " << rows << " x " << cols << " fringe pattern is " << time << " [ms]" << endl;
+	cout << "paWFF core algorithm Running time for " << rows << " x " << cols << " fringe pattern is " << time << " [ms]" << endl;
 
 	/* Output results for verification */
 	cufftComplex *h_zfiltered = (cufftComplex*)malloc(sizeof(cufftComplex) * cols * rows);
+
+	cudaEvent_t start, end;
+	cudaEventCreate(&start);
+	cudaEventCreate(&end);
+	cudaEventRecord(start);
 	checkCudaErrors(cudaMemcpy(h_zfiltered, z.m_d_filtered, sizeof(cufftComplex) *cols * rows, cudaMemcpyDeviceToHost));
+	cudaEventRecord(end);
+	cudaEventSynchronize(end);
+	float f_timeTransfer = 0;
+	cudaEventElapsedTime(&f_timeTransfer, start, end);
+	cudaEventDestroy(start);
+	cudaEventDestroy(end);
+
+	cout << "paWFF memory transfer time for " << " is " << f_timeTransfer << " [ms]" << endl;
 
 	std::ofstream out;
 	out.open("Test\\z_filtered_512.csv", std::ios::out | std::ios::trunc);

@@ -410,6 +410,9 @@ WFF2_CUDAF::WFF2_CUDAF(int iWidth, int iHeight,
 	, m_d_yf(nullptr)
 	, im_d_Fg(nullptr)
 	, im_d_filtered(nullptr)
+	, m_fCoreTime(0)
+	, m_fMemTime(0)
+	, m_fPrecomputeTime(0)
 {
 	// Get the number of SMs on GPU 
 	cudaDeviceGetAttribute(&m_iSMs, cudaDevAttrMultiProcessorCount, 0);
@@ -451,12 +454,16 @@ WFF2_CUDAF::WFF2_CUDAF(int iWidth, int iHeight,
 	, m_d_yf(nullptr)
 	, im_d_Fg(nullptr)
 	, im_d_filtered(nullptr)
+	, m_fCoreTime(0)
+	, m_fMemTime(0)
+	, m_fPrecomputeTime(0)
 {
 	// Get the number of SMs on GPU 
 	cudaDeviceGetAttribute(&m_iSMs, cudaDevAttrMultiProcessorCount, 0);
 
 	// scale for window so that norm2 of the window is 1. 
 	m_rGaussianNorm2 = sqrt(4 * float(M_PI)*m_rSigmaX*m_rSigmaY);
+
 
 	/* Do the Initialization */
 	if (-1 == Initialize(z))
@@ -468,16 +475,28 @@ WFF2_CUDAF::WFF2_CUDAF(int iWidth, int iHeight,
 
 WFF2_CUDAF::~WFF2_CUDAF()
 {
+	cudaEvent_t start, end;
+	cudaEventCreate(&start);
+	cudaEventCreate(&end);
+
+	cudaEventRecord(start);
 	cudaSafeFree(m_d_fPadded);
 	cudaSafeFree(m_d_xf);
 	cudaSafeFree(m_d_yf);
-
-	cufftDestroy(m_planPadded);
 
 	cudaSafeFree(im_d_filtered);
 	cudaSafeFree(im_d_Fg);
 	cudaSafeFree(im_d_Sf);
 	cudaSafeFree(m_d_rThr);
+	cudaEventRecord(end);
+	cudaEventSynchronize(end);
+	float t = 0;
+	cudaEventElapsedTime(&t, start, end);
+	m_fMemTime += t;
+
+	std::cout << "paWFF Memory alloc/dealloc time is: " << m_fMemTime << " ms" << std::endl;
+
+	cufftDestroy(m_planPadded);
 }
 
 void WFF2_CUDAF::operator()(cufftComplex *d_f,
@@ -489,14 +508,17 @@ void WFF2_CUDAF::operator()(cufftComplex *d_f,
 
 void WFF2_CUDAF::cuWFF2(cufftComplex *d_f, WFT2_DeviceResultsF &d_z, double &time)
 {
+	m_fCoreTime = 0;
+
 	/* CUDA blocks & threads scheduling */
 	dim3 threads(BLOCK_SIZE_16, BLOCK_SIZE_16);
 	dim3 blocksPadded((m_iPaddedWidth + BLOCK_SIZE_16 - 1) / BLOCK_SIZE_16, (m_iPaddedHeight + BLOCK_SIZE_16 - 1) / BLOCK_SIZE_16);
 	dim3 blocksImg((m_iWidth + BLOCK_SIZE_16 - 1) / BLOCK_SIZE_16, (m_iHeight + BLOCK_SIZE_16 - 1) / BLOCK_SIZE_16);
 	int blocks1D = std::min((m_iPaddedWidth*m_iPaddedHeight + BLOCK_SIZE_256 - 1) / BLOCK_SIZE_256, 2048);
 
-	cudaEvent_t start, end;
+	cudaEvent_t start, pre, end;
 	cudaEventCreate(&start);
+	cudaEventCreate(&pre);
 	cudaEventCreate(&end);
 	/* Set the threshold m_rThr if it's not specified by the client */
 
@@ -512,6 +534,8 @@ void WFF2_CUDAF::cuWFF2(cufftComplex *d_f, WFT2_DeviceResultsF &d_z, double &tim
 	/* Clear the results if they already contain last results */
 	init_WFF_matrices_kernel << <blocksImg, threads >> >(d_z.m_d_filtered, m_iWidth, m_iHeight);
 	getLastCudaError("init_WFF_matrices_kernel Launch Failed!");
+	cudaEventRecord(pre);
+
 
 	/* Insert this part inbetween to realize kind of CPU&GPU concurrent execution.
 	map the wl: wi : wh interval to integers from  0 to size = (wyh - wyl)/wyi + 1 in order to divide the
@@ -569,14 +593,30 @@ void WFF2_CUDAF::cuWFF2(cufftComplex *d_f, WFT2_DeviceResultsF &d_z, double &tim
 	cudaEventSynchronize(end);
 
 	// Calculate the running time
-	float t = 0;
-	cudaEventElapsedTime(&t, start, end);
-	time = double(t);
+	float t_precompute = 0;
+
+	cudaEventElapsedTime(&t_precompute, start, pre);
+	cudaEventElapsedTime(&m_fCoreTime, pre, end);
+
+	m_fPrecomputeTime += t_precompute;
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(pre);
+	cudaEventDestroy(end);
+
+	std::cout << "paWFF Precomputation Time: " << m_fPrecomputeTime << " ms" << std::endl;
+	time = double(m_fCoreTime);
 }
 
 /* Private functions */
 int WFF2_CUDAF::Initialize(WFT2_DeviceResultsF &d_z)
 {
+	cudaEvent_t start, ma, plan, end;
+	cudaEventCreate(&start);
+	cudaEventCreate(&ma);
+	cudaEventCreate(&plan);
+	cudaEventCreate(&end);
+
 	/*----------------------------WFF&WFR Common parameters initialization-----------------------------*/
 	// Half of the Gaussian Window size
 	m_iSx = int(round(3 * m_rSigmaX));
@@ -605,15 +645,18 @@ int WFF2_CUDAF::Initialize(WFT2_DeviceResultsF &d_z)
 
 		int iPaddedSize = m_iPaddedHeight * m_iPaddedWidth;
 
+		cudaEventRecord(start);
 		/* Memory Preallocation on Device */
 		// Allocate memory for input padded f which is pre-copmuted and remain unchanged
 		checkCudaErrors(cudaMalloc((void**)&m_d_fPadded, sizeof(cufftComplex)*iPaddedSize));
 		checkCudaErrors(cudaMalloc((void**)&m_d_xf, sizeof(cufftReal)*iPaddedSize));
 		checkCudaErrors(cudaMalloc((void**)&m_d_yf, sizeof(cufftReal)*iPaddedSize));
+		cudaEventRecord(ma);
 
 		/* Make the CUFFT plans */
 		checkCudaErrors(cufftPlan2d(&m_planPadded, m_iPaddedHeight, m_iPaddedWidth, CUFFT_C2C));
 
+		cudaEventRecord(plan);
 		/* Construct the xf & yf */
 		dim3 threads(BLOCK_SIZE_16, BLOCK_SIZE_16);
 		dim3 blocks((m_iPaddedWidth + BLOCK_SIZE_16 - 1) / BLOCK_SIZE_16, (m_iPaddedHeight + BLOCK_SIZE_16 - 1) / BLOCK_SIZE_16);
@@ -624,9 +667,25 @@ int WFF2_CUDAF::Initialize(WFT2_DeviceResultsF &d_z)
 		// Shift xf, yf to match the FFT's results
 		fftshift_xf_yf_kernel << <blocks, threads >> >(m_d_xf, m_d_yf, m_iPaddedWidth, m_iPaddedHeight);
 		getLastCudaError("fftshift_xf_yf_kernel Launch Failed!");
+		cudaEventRecord(end);
+		cudaEventSynchronize(end);
 
-		cuWFF2_Init(d_z);		
+		float f_time_MemAlloc = 0;
+		float f_time_Pre = 0;
+		
+		cudaEventElapsedTime(&f_time_MemAlloc, start, ma);
+		cudaEventElapsedTime(&f_time_Pre, plan, end);
+
+		m_fMemTime += f_time_MemAlloc;
+		m_fPrecomputeTime += f_time_Pre;
+
+		cuWFF2_Init(d_z);
 	}
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(ma);
+	cudaEventDestroy(plan);
+	cudaEventDestroy(end);
 
 	return 0;
 }
@@ -636,6 +695,11 @@ void WFF2_CUDAF::cuWFF2_Init(WFT2_DeviceResultsF &d_z)
 	int iImageSize = m_iWidth * m_iHeight;
 	int iPaddedSize = m_iPaddedHeight * m_iPaddedWidth;
 
+	cudaEvent_t start, end;
+	cudaEventCreate(&start);
+	cudaEventCreate(&end);
+
+	cudaEventRecord(start);
 	// Allocate memory for the final results
 	checkCudaErrors(cudaMalloc((void**)&d_z.m_d_filtered, sizeof(cufftComplex)*iImageSize));
 
@@ -649,6 +713,17 @@ void WFF2_CUDAF::cuWFF2_Init(WFT2_DeviceResultsF &d_z)
 	{
 		checkCudaErrors(cudaMalloc((void**)&m_d_rThr, sizeof(float)));
 	}
+	cudaEventRecord(end);
+	cudaEventSynchronize(end);
+
+	float time = 0;
+
+	cudaEventElapsedTime(&time, start, end);
+
+	m_fMemTime += time;
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(end);
 }
 
 void WFF2_CUDAF::cuWFF2_feed_fPadded(cufftComplex *d_f)
