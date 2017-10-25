@@ -21,7 +21,7 @@ This is the source code associated with the book *GPU-Acceleration for Optical M
     1. Download [OpenCV 3.1](https://opencv.org/opencv-3-1.html)
     2. Right click "Computer" -> Advanced System Settings -> Advanced -> Environment variables, add a new virable to "System Variables" as
        "OPENCV_DIR" with the value 
-         '<YOUR_OPENCV_INSTALLATION_PATH\build\x64\vc12(vc14)>'
+         '''YOUR_OPENCV_INSTALLATION_PATH\build\x64\vc12(vc14)'''
     3. If you want your program to run directly, add "%OPENCV_DIR%\bin" to the "User Variables" 's "Path".
 ### Compilation on MAC OS or Linux
   * Please follow the [CUDA programming guide](http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html)
