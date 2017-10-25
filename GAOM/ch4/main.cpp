@@ -101,9 +101,9 @@ void testICGN(cv::Mat& imgR, cv::Mat& imgT)
 	// Output results
 	ofstream oFile;
 	oFile.open("Test\\ICGN_data.csv", ios::out | ios::trunc);
-	oFile << "X" << ", \t" << "Y" << ", \t" << "U" << ", \t" << "Ux" << ", \t" << "Uy"
-		<< ", \t" << "V" << ", \t" << "Vx" << ", \t" << "Vy" << ", \t"
-		<< "Interation" << ", \t" << endl;
+	oFile << "X" << "," << "Y" << "," << "U" << "," << "Ux" << "," << "Uy"
+		<< "," << "V" << "," << "Vx" << "," << "Vy" << ","
+		<< "Interation" << "," << endl;
 	for (int i = 0; i < m_iNumberY; i++)
 	{
 		for (int j = 0; j < m_iNumberX; j++)
