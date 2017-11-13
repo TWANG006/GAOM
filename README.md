@@ -1,6 +1,6 @@
-# GAOM - GPU-Acceleration for Optical Methods
+# GAOM - GPU-Acceleration for Optical Measurement
 ## Introduction
-This is the source code associated with the book *GPU-Acceleration for Optical Methods*, SPIE Spotlight, under peer review. The details within each project folder are explained as below.
+This is the source code associated with the book *GPU-Acceleration for Optical Measurement*, SPIE Spotlight, under peer review. The details within each project folder are explained as below.
   * ch2:
     * vec_add.h(.cpp)   CPU and GPU implementations of vector addition
     * grad_calc.h(.cpp) Pointwise and tiled implementations of image gradient calculation
