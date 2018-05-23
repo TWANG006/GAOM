@@ -25,3 +25,5 @@ This is the source code associated with the book *GPU-Acceleration for Optical M
     3. If you want your program to run directly, add "%OPENCV_DIR%\bin" to the "User Variables" 's "Path".
 ### Compilation on MAC OS or Linux
   * Please follow the [CUDA programming guide](http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html)
+
+**Note: Only the "Release" mode was configured in the provided example code. 
