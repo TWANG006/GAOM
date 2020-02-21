@@ -2,7 +2,8 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto
-
+*.cu linguist-language=CUDA
+*.cuh linguist-language=CUDA
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
