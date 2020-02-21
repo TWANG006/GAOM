@@ -7,7 +7,7 @@
 *.xlsx linguist-documentation
 *.csv linguist-documentation
 *.txt linguist-documentation
-*.inl linguist-language=C++
+*.cu linguist-language=cuda
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
