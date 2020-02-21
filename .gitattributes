@@ -4,6 +4,8 @@
 * text=auto
 *.cu linguist-language=CUDA
 *.cuh linguist-language=CUDA
+*.h linguist-language=C++
+*.cpp linguist-language=C++
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
