@@ -5,6 +5,9 @@
 *.vcxproj linguist-documentation
 *.cu linguist-language=CUDA
 *.cuh linguist-language=CUDA
+*.xlsx linguist-documentation
+*.csv linguist-documentation
+*.txt linguist-documentation
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
