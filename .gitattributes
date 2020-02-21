@@ -2,13 +2,7 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto
-*.vcxproj linguist-documentation
-*.filters linguist-documentation
-*.xlsx linguist-documentation
-*.csv linguist-documentation
-*.txt linguist-documentation
-*.cu linguist-language=Cuda
-*.bmp  linguist-documentation
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
