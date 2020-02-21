@@ -8,6 +8,7 @@
 *.csv linguist-documentation
 *.txt linguist-documentation
 *.cu linguist-language=cuda
+*.bmp  linguist-documentation
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
@@ -48,7 +49,6 @@
 #*.jpg   binary
 #*.png   binary
 #*.gif   binary
-*.bmp binary
 
 ###############################################################################
 # diff behavior for common document formats
