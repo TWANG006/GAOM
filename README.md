@@ -1,6 +1,6 @@
 # GAOM - GPU-Acceleration for Optical Measurement
 ## Introduction
-This is the source code associated with the book *GPU-Acceleration for Optical Measurement*, SPIE Spotlight, under peer review. The details within each project folder are explained as below.
+This is the source code associated with the book *GPU-Acceleration for Optical Measurement*, SPIE Spotlight, 2017. The details within each project folder are explained as below.
   * ch2:
     * vec_add.h(.cpp)   CPU and GPU implementations of vector addition
     * grad_calc.h(.cpp) Pointwise and tiled implementations of image gradient calculation
@@ -13,12 +13,12 @@ This is the source code associated with the book *GPU-Acceleration for Optical M
 ## Use the code
 ### Project dependencies:
   * [CUDA 8.0](https://developer.nvidia.com/cuda-80-ga2-download-archive) for writing GPU code
-  * [OpenCV 3.1](https://opencv.org/opencv-3-1.html) for convenient image I/O
+  * [OpenCV 3.4.1](https://opencv.org/opencv-3-1.html) for convenient image I/O
 ### Compilation on Windows
   * Download and install [Visual Studio 2015+](https://www.visualstudio.com/vs/older-downloads/)
   * Download and install [CUDA 8.0](https://developer.nvidia.com/cuda-80-ga2-download-archive)
   * Install OpenCV 3.1:
-    1. Download [OpenCV 3.1](https://opencv.org/opencv-3-1.html)
+    1. Download [OpenCV 3.4.1](https://opencv.org/opencv-3-1.html)
     2. Right click "Computer" -> Advanced System Settings -> Advanced -> Environment variables, add a new virable to "System Variables" as
        "OPENCV_DIR" with the value 
          `YOUR_OPENCV_INSTALLATION_PATH\build\x64\vc12(vc14)`
